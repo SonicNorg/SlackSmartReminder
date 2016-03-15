@@ -1,6 +1,8 @@
 package com.grizzly.studio.slacksmartreminder;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -20,25 +22,29 @@ public class Main {
 
     public Main() {
         setTime();
+
+        addUser("maksim.budyko");
+        addUser("sergey.ermokhin");
+        addUser("maxim.zelensky");
+        addUser("norg");
+        addUser("evgeniy.sokolov");
+        addUser("daniilut");
+        addUser("tatyana.chusovlyanova");
+        setCurrentUser("tatyana.chusovlyanova");
+        setUserEnabled("norg", false);
     }
 
     public static void main(String[] args) {
-        Main app = new Main();
-        try {
+        final Main app = new Main();
+        PrintStream console = System.out;
+        try (PrintStream f = new PrintStream(new File("log.txt"))) {
+            System.setOut(f);
             commandList.add("!команды");
+            System.out.println("Going to connect...");
             app.connect();
 
-            app.addUser("maksim.budyko");
-            app.addUser("sergey.ermokhin");
-            app.addUser("maxim.zelensky");
-            app.addUser("norg");
-            app.addUser("evgeniy.sokolov");
-            app.addUser("daniilut");
-            app.addUser("tatyana.chusovlyanova");
-            app.setCurrentUser("tatyana.chusovlyanova");
-            app.setUserEnabled("norg", false);
 
-            app.session.addMessagePostedListener(new SlackMessagePostedListener() {
+            session.addMessagePostedListener(new SlackMessagePostedListener() {
                 @Override
                 public void onEvent(SlackMessagePosted event, SlackSession session) {
                     //todo interface Command, class CommandParser, etc.
@@ -64,7 +70,9 @@ public class Main {
                 }
             });
         }catch (IOException e) {
-            System.err.println(e);
+            System.out.println(e);
+        }finally {
+            System.setOut(console);
         }
     }
 
